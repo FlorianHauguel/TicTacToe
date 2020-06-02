@@ -1,9 +1,17 @@
 import numpy as np
 import enum
+import random
 
 class Player(enum.Enum):
    Player1 = 'x'
    Player2 = 'o'
+
+def PlayerNameFromValue(val):
+	if val == 'x':
+		return Player.Player1.name
+	if val == 'o':
+		return Player.Player2.name
+	return -1
 
 class TicTacToe():
 	def __init__(self):
@@ -36,46 +44,37 @@ class TicTacToe():
 		print()
 		print('     0   1   2', end = "")
 		print()
-		print('  ', '-' * 12)
+		print('  ', '-' * 13)
 
 		for i in range(3):
 			print(i,' | ', end = "")
 			for j in range(3):
-				print(self.board[i][j], ' | ', end = "")
+				toPrint = ' '
+				if self.board[i][j] != '':
+					toPrint = self.board[i][j]
+				print(toPrint, '| ', end = "")
 			print()
-			print('  ', '-' * 12)
+			print('  ', '-' * 13)
 		print()
 		print(self.turnToPlay.name, '(',self.turnToPlay.value,') is the next player')
 		print()
 
 	def IsWinning(self):
-		# checking result in rows
-		for row in range(MaxRow):
-			for col in range(MaxCol - 4):
-				if self.board[row][col] != '' and self.board[row][col] == self.board[row][col + 1] == self.board[row][col + 2] == self.board[row][col + 3]:
-					print('there is a win in row', row, 'col from', col, col + 3, 'for', PlayerNameFromValue(self.board[row][col]))
-					return True
+		for i in range(3):
+			if self.board[i][0] == self.board[i][1] == self.board[i][2] and self.board[i][0] != '':
+				print('there is a win in row', i, 'for', PlayerNameFromValue(self.board[i][0]))
+				return True
+			if self.board[0][i] == self.board[1][i] == self.board[2][i] and self.board[0][i] != '':
+				print('there is a win in column', i, 'for', PlayerNameFromValue(self.board[0][i]))
+				return True
 
-		# checking result in columns
-		for col in range(MaxCol):
-			for row in range(MaxRow - 4):
-				if self.board[row][col] != '' and self.board[row][col] == self.board[row + 1][col] == self.board[row + 2][col] == self.board[row + 3][col]:
-					print('there is a win in column', col, 'row from', row, row + 3, 'for', PlayerNameFromValue(self.board[row][col]))
-					return True
+		if self.board[0][0] == self.board[1][1] == self.board[2][2] and self.board[1][1] != '':
+			print('there is a win in downward diag for', PlayerNameFromValue(self.board[1][1]))
+			return True
 
-		# checking result in upward diagonals
-		for row in range (3):
-			for col in range(4):
-				if self.board[row][col] != '' and self.board[row][col] == self.board[row + 1][col + 1] == self.board[row + 2][col + 2] == self.board[row + 3][col + 3]:
-					print('there is a win in upward diagonal from', (row, col), 'to', (row + 3, col + 3), 'for', PlayerNameFromValue(self.board[row][col]))
-					return True
-
-		# checking result in downward diagonals
-		for row in range (MaxRow - 1, 2, -1):
-			for col in range(4):
-				if self.board[row][col] != '' and self.board[row][col] == self.board[row - 1][col + 1] == self.board[row - 2][col + 2] == self.board[row - 3][col + 3]:
-					print('there is a win in downward diagonal from', (row, col), 'to', (row - 3, col + 3), 'for', PlayerNameFromValue(self.board[row][col]))
-					return True
+		if self.board[2][0] == self.board[1][1] == self.board[0][2] and self.board[1][1] != '':
+			print('there is a win in upward diag for', PlayerNameFromValue(self.board[1][1]))
+			return True
 
 		return False
 
@@ -83,3 +82,19 @@ class TicTacToe():
 
 myTicTacToe = TicTacToe()
 myTicTacToe.Render()
+
+'''
+for x in range(6):
+	i = random.randint(0, 2)
+	j = random.randint(0, 2)
+	myTicTacToe.PlaceMark(i, j)
+'''
+
+while myTicTacToe.IsWinning() == False:
+	case = input('Enter your choice (row, col):').split(',')
+	row = int(case[0])
+	col = int(case[1])
+	print(row, col)
+	myTicTacToe.PlaceMark(row, col)
+	myTicTacToe.Render()
+
