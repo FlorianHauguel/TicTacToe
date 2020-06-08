@@ -161,7 +161,6 @@ class Tree():
 	def MiniMax(self, currentPlayer, depth = 0):
 		#what if the position is winning?
 		if self.TicTacToe.IsWinning():
-			#print('Game already won by', self.TicTacToe.LastPlayed().value)
 			return -1 #shouldn't happened, and if it does this return value is wrong
 		
 		firstChild = True
@@ -173,44 +172,25 @@ class Tree():
 				if self.TicTacToe.board[i][j] == '':
 					newChild = Tree(self.TicTacToe)
 					newChild.move = (i, j)
-					#print('Depth:', depth, (i, j), 'Turn to play:', newChild.TicTacToe.turnToPlay.value)
-					#input('Press Enter...')
 					newChild.TicTacToe.PlaceMark(i, j)
-
 					self.children.append(newChild)
 
-					#newChild.TicTacToe.Render()
-
 					if newChild.TicTacToe.IsWinning(): #parent loop, we check if the last player has won.
-						#print(newChild.TicTacToe.LastPlayed().value, 'win')
-						#input('Press Enter...')
 						if newChild.TicTacToe.LastPlayed() == currentPlayer: # max mode
-							#print('parent loop: max win')
-							#input('Press Enter...')
 							newChild.score = 1
 						else:  # min mode
-							#print('parent loop: min win')
-							#input('Press Enter...')
 							newChild.score = -1
 						return newChild.score
 
 					else: #we check the other player in child loop.
 						score = newChild.MiniMax(currentPlayer, depth + 1)
 						newChild.score = score
-						#print('score:', score)
-						#print('last played', newChild.TicTacToe.LastPlayed())
-						#print('we check for', currentPlayer)
-						#input('Press Enter...')
 
 						# we can do some optimization with the returned score
 						if  score == 1 and newChild.TicTacToe.LastPlayed() == currentPlayer: # max mode
-							#print('child loop: this is a match, we return', newChild.score)
-							#input('Press Enter...')
 							return score # OPTIMIZATION: we don't need to check the other branch, 1 is the first max, but a max, let's pick it
 						
 						if 	score == -1 and newChild.TicTacToe.LastPlayed() != currentPlayer:  # min mode
-							#print('child loop: this is a min match, we return', newChild.score)
-							#input('Press Enter...')
 							return score # OPTIMIZATION: we don't need to check the other branch, -1 is the first min, let's pick it
 						
 						# if we can't decide, we need to take the min or the max of the rest of the branches
@@ -218,20 +198,11 @@ class Tree():
 							bestScore = newChild.score
 							bestMove = newChild.move
 							firstChild = False
-							#print('first child, we take it as best score for now...', bestScore, ':', bestMove)
-							#input('Press Enter...')
 						else:
 							if newChild.TicTacToe.LastPlayed() == currentPlayer:
-								#print(depth, 'max conf, we take the max between', bestScore, 'and', score)
-								#input('Press Enter...')
 								bestScore = max(bestScore, score)
 							else:
-								#print(depth, 'min conf, we take the min between', bestScore, 'and', score)
-								#input('Press Enter...')
 								bestScore = min(bestScore, score)
-
-		#print('Return total score', bestScore)
-		#input('Press Enter...')
 		return bestScore
 
 
