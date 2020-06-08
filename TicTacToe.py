@@ -1,18 +1,7 @@
 import numpy as np
-import enum
-import random
-import operator
 
-class Player(enum.Enum):
-   Player1 = 'x'
-   Player2 = 'o'
-
-def PlayerNameFromValue(val):
-	if val == 'x':
-		return Player.Player1.name
-	if val == 'o':
-		return Player.Player2.name
-	return -1
+from Player import *
+from TicTacTree import *
 
 class TicTacToe():
 	def __init__(self):
@@ -110,7 +99,7 @@ class TicTacToe():
 		while self.IsFinished() == False:
 			coord = input('Enter your move (x, y) and h for hint:')
 			if coord == 'h':
-				myTree = Tree(myTicTacToe)
+				myTree = TicTacTree(myTicTacToe)
 				myTree.MiniMax(myTicTacToe.turnToPlay)
 				myTree.BestMove()
 				self.Render()
@@ -132,122 +121,14 @@ class TicTacToe():
 			self.Render()
 
 			if self.IsFinished() == False:
-				myTree = Tree(myTicTacToe)
+				myTree = TicTacTree(myTicTacToe)
 				myTree.MiniMax(myTicTacToe.turnToPlay)
 				bestMove = myTree.BestMove()
 				self.PlaceMark(bestMove[0], bestMove[1])
 				self.Render()
 		input('Hit space to finish')
 
-class Tree():
-	def __init__(self, ticTac):
-		self.TicTacToe = ticTac.DeepCopy()
-		self.score = 0
-		self.move = (-1, -1)
-		self.children = []
-
-	def BestMove(self):
-		bestChild = max(self.children, key=lambda item: item.score)
-		print('best move is', bestChild.move, 'score:', bestChild.score)
-		return bestChild.move
-
-	def Child(self, x, y):
-		for child in self.children:
-			if child.move == (x, y):
-				return child
-		print('couldn\'t find the child', (x, y))
-		return
-
-	def MiniMax(self, currentPlayer, depth = 0):
-		#what if the position is winning?
-		if self.TicTacToe.IsWinning():
-			return -1 #shouldn't happened, and if it does this return value is wrong
-		
-		firstChild = True
-		bestScore = 0
-		bestMove = (-1, -1)
-
-		for i in range(3):
-			for j in range(3):
-				if self.TicTacToe.board[i][j] == '':
-					newChild = Tree(self.TicTacToe)
-					newChild.move = (i, j)
-					newChild.TicTacToe.PlaceMark(i, j)
-					self.children.append(newChild)
-
-					if newChild.TicTacToe.IsWinning(): #parent loop, we check if the last player has won.
-						if newChild.TicTacToe.LastPlayed() == currentPlayer: # max mode
-							newChild.score = 1
-						else:  # min mode
-							newChild.score = -1
-						return newChild.score
-
-					else: #we check the other player in child loop.
-						score = newChild.MiniMax(currentPlayer, depth + 1)
-						newChild.score = score
-
-						# we can do some optimization with the returned score
-						if  score == 1 and newChild.TicTacToe.LastPlayed() == currentPlayer: # max mode
-							return score # OPTIMIZATION: we don't need to check the other branch, 1 is the first max, but a max, let's pick it
-						
-						if 	score == -1 and newChild.TicTacToe.LastPlayed() != currentPlayer:  # min mode
-							return score # OPTIMIZATION: we don't need to check the other branch, -1 is the first min, let's pick it
-						
-						# if we can't decide, we need to take the min or the max of the rest of the branches
-						if firstChild:
-							bestScore = newChild.score
-							bestMove = newChild.move
-							firstChild = False
-						else:
-							if newChild.TicTacToe.LastPlayed() == currentPlayer:
-								bestScore = max(bestScore, score)
-							else:
-								bestScore = min(bestScore, score)
-		return bestScore
-
-
-def Example1(input):
-	input.PlaceMark(2, 0)
-	input.PlaceMark(0, 0)
-	input.PlaceMark(0, 2)
-	input.PlaceMark(1, 1)
-	input.PlaceMark(2, 2)
-	input.PlaceMark(1, 2)
-
-def Example2(input):
-	input.PlaceMark(2, 0)
-	input.PlaceMark(0, 0)
-	input.PlaceMark(0, 2)
-	input.PlaceMark(1, 1)
-
-def Example3(input):
-	input.PlaceMark(0, 0)
-	input.PlaceMark(1, 1)
-	input.PlaceMark(2, 2)
-	input.PlaceMark(2, 0)
 
 myTicTacToe = TicTacToe()
 myTicTacToe.PvBot()
-
-
-
-
-
-
-'''
-Example3(myTicTacToe)
-myTicTacToe.Render()
-
-
-myTree = Tree(myTicTacToe)
-myTree.MiniMax()
-myTicTacToe.Render()
-myTree.BestMove()
-
-for child in myTree.children:
-	print(child.score, child.move)
-
-print(myTree.Child(0,2))
-'''
-
 
